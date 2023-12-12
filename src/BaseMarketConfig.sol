@@ -59,6 +59,16 @@ abstract contract BaseMarketConfig {
         address /* buyer */
     ) external virtual;
 
+    /**
+     * @dev Final setup prior to starting tests
+     * @ param seller The seller address used for testing the marketplace
+     * @ param buyer The buyer address used for testing the marketplace
+     */
+    function beforeAllPrepareMarketplaceCollections(
+        address, /* ERC721 */
+        address /* ERC1155 */
+    ) external virtual {}
+
     /*//////////////////////////////////////////////////////////////
                         Test Payload Calls
     //////////////////////////////////////////////////////////////*/
@@ -553,6 +563,51 @@ abstract contract BaseMarketConfig {
     {
         _notImplemented();
     }
+
+    function getPayload_SweepERC721CollectionWithEther(
+        TestOrderContext[] calldata, /*contexts*/
+        TestItem721[] calldata, /*nfts*/
+        uint256[] calldata /*ethAmounts*/
+    ) 
+        external 
+        virtual
+        returns (
+            TestOrderPayload memory /*execution*/
+        )
+    {
+        _notImplemented();
+    }
+
+    function getPayload_SweepERC721CollectionWithErc20(
+        TestOrderContext[] calldata, /*contexts*/
+        address, /*erc20Address*/
+        TestItem721[] calldata, /*nfts*/
+        uint256[] calldata /*erc20Amounts*/
+    ) 
+        external 
+        virtual 
+        returns (
+            TestOrderPayload memory /*execution*/
+        )
+    {
+        _notImplemented();
+    }
+
+    function getPayload_SweepERC721CollectionWithWETH(
+        TestOrderContext[] calldata, /*contexts*/
+        address, /*erc20Address*/
+        TestItem721[] calldata, /*nfts*/
+        uint256[] calldata /*erc20Amounts*/
+    ) 
+        external 
+        virtual 
+        returns (
+            TestOrderPayload memory /*execution*/
+        )
+    {
+        _notImplemented();
+    }
+
 
     /*//////////////////////////////////////////////////////////////
                           Helpers
