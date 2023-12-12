@@ -62,11 +62,13 @@ contract GenericMarketplaceTest is BaseOrderTest {
     function testBlur() external {
         benchmarkMarket(blurConfig);
     }
+    */
 
     function testBlurV2() external {
         benchmarkMarket(blurV2Config);
     }
 
+    /*
     function testFoundation() external {
         benchmarkMarket(foundationConfig);
     }
@@ -104,11 +106,11 @@ contract GenericMarketplaceTest is BaseOrderTest {
     // function testWyvern() external {
     //     benchmarkMarket(wyvernConfig);
     // }
-    */
 
     function testPaymentProcessor() external {
         benchmarkMarket(paymentProcessorConfig);
     }
+    */
 
     function testPaymentProcessorV2() external {
         benchmarkMarket(paymentProcessorV2Config);
