@@ -33,7 +33,7 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
     uint256 internal securityPolicyId;
 
     IPaymentProcessor paymentProcessor =
-        IPaymentProcessor(address(0x009a1dC629242961C9E4f089b437aFD394474cc0));
+        IPaymentProcessor(address(0x009a1dc9F1A6e2134aD4236Fcd75B1aE62858507));
     mapping(address => uint256) internal _nonces;
 
     function name() external pure override returns (string memory) {
