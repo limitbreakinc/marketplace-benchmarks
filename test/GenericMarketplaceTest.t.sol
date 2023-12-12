@@ -62,11 +62,11 @@ contract GenericMarketplaceTest is BaseOrderTest {
     function testBlur() external {
         benchmarkMarket(blurConfig);
     }
-    */
 
     function testBlurV2() external {
         benchmarkMarket(blurV2Config);
     }
+    */
 
     /*
     function testFoundation() external {
@@ -117,7 +117,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
     }
 
     function benchmarkMarket(BaseMarketConfig config) public {
-        beforeAllPrepareMarketplaceTest(config);
+        //beforeAllPrepareMarketplaceTest(config);
         benchmark_BuyOfferedERC721WithEther(config);
         benchmark_BuyOfferedERC1155WithEther(config);
         benchmark_BuyOfferedERC721WithWETH(config);
@@ -1854,6 +1854,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
     function setUp() public virtual override {
         super.setUp();
+
+        beforeAllPrepareMarketplaceTest(paymentProcessorV2Config);
+        beforeAllPrepareMarketplaceTest(seaportOnePointFiveConfig);
     }
 
     modifier prepareTest(BaseMarketConfig config) {

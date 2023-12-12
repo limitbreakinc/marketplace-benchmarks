@@ -31,6 +31,14 @@ contract PaymentProcessorV2Config is BaseMarketConfig, Test {
         buyerNftApprovalTarget = sellerNftApprovalTarget = buyerErc20ApprovalTarget = sellerErc20ApprovalTarget = address(
             paymentProcessor
         );
+
+        vm.startPrank(seller);
+        paymentProcessor.revokeSingleNonce(encoder.encodeRevokeSingleNonceCalldata(address(paymentProcessor), _getNextNonce(seller)));
+        vm.stopPrank();
+
+        vm.startPrank(buyer);
+        paymentProcessor.revokeSingleNonce(encoder.encodeRevokeSingleNonceCalldata(address(paymentProcessor), _getNextNonce(buyer)));
+        vm.stopPrank();
     }
 
      function beforeAllPrepareMarketplaceCollections(address test721_1, address test1155_1) external override {
