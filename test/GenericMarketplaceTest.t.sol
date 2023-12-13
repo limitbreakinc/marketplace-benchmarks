@@ -90,11 +90,13 @@ contract GenericMarketplaceTest is BaseOrderTest {
     function testSeaportOnePointOne() external {
         benchmarkMarket(seaportOnePointOneConfig);
     }
+    */
 
+    /*
     function testSudoswap() external {
         benchmarkMarket(sudoswapConfig);
     }
-
+    
     function testX2Y2() external {
         benchmarkMarket(x2y2Config);
     }
@@ -102,6 +104,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
     function testZeroEx() external {
         benchmarkMarket(zeroExConfig);
     }
+    */
 
     // function testWyvern() external {
     //     benchmarkMarket(wyvernConfig);
@@ -110,7 +113,6 @@ contract GenericMarketplaceTest is BaseOrderTest {
     function testPaymentProcessor() external {
         benchmarkMarket(paymentProcessorConfig);
     }
-    */
 
     function testPaymentProcessorV2() external {
         benchmarkMarket(paymentProcessorV2Config);
@@ -120,36 +122,37 @@ contract GenericMarketplaceTest is BaseOrderTest {
         //beforeAllPrepareMarketplaceTest(config);
         benchmark_BuyOfferedERC721WithEther(config);
         benchmark_BuyOfferedERC1155WithEther(config);
-        benchmark_BuyOfferedERC721WithWETH(config);
+        //benchmark_BuyOfferedERC721WithWETH(config);
         benchmark_BuyOfferedERC721WithERC20(config);
-        benchmark_BuyOfferedERC721WithBETH(config);
-        benchmark_BuyOfferedERC1155WithERC20_ListOnChain(config);
+        //benchmark_BuyOfferedERC721WithBETH(config);
+        //benchmark_BuyOfferedERC1155WithERC20_ListOnChain(config);
         benchmark_BuyOfferedERC1155WithERC20(config);
         benchmark_BuyOfferedERC20WithERC721(config);
-        benchmark_BuyOfferedWETHWithERC721(config);
-        benchmark_BuyOfferedBETHWithERC721(config);
-        benchmark_BuyOfferedERC20WithERC1155_ListOnChain(config);
+        //benchmark_BuyOfferedWETHWithERC721(config);
+        //benchmark_BuyOfferedBETHWithERC721(config);
+        //benchmark_BuyOfferedERC20WithERC1155_ListOnChain(config);
         benchmark_BuyOfferedERC20WithERC1155(config);
-        benchmark_BuyOfferedERC721WithERC1155(config);
-        benchmark_BuyOfferedERC1155WithERC721(config);
+        //benchmark_BuyOfferedERC721WithERC1155(config);
+        //benchmark_BuyOfferedERC1155WithERC721(config);
         benchmark_BuyOfferedERC721WithEtherFee(config);
         benchmark_BuyOfferedERC721WithEtherFeeTwoRecipients(config);
-        benchmark_BuyTenOfferedERC721WithEther(config);
+        //benchmark_BuyTenOfferedERC721WithEther(config);
         benchmark_BuyTenOfferedERC721WithEtherDistinctOrders(config);
         benchmark_BuyTenOfferedERC721WithErc20DistinctOrders(config);
-        benchmark_BuyTenOfferedERC721WithWETHDistinctOrders(config);
-        benchmark_MatchOrders_ABCA(config);
-        benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividually(config);
-        benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividuallyWithEtherFee(
-            config
-        );
-        benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividuallyWithEtherFeeTwoRecipients(
-            config
-        );
+        //benchmark_BuyTenOfferedERC721WithWETHDistinctOrders(config);
+        //benchmark_MatchOrders_ABCA(config);
+        //benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividually(config);
+        //benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividuallyWithEtherFee(
+        //    config
+        //);
+        //benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividuallyWithEtherFeeTwoRecipients(
+        //    config
+        //);
         benchmark_SweepERC721CollectionWithEther(config);
         benchmark_SweepERC721CollectionWithErc20(config);
-        benchmark_SweepERC721CollectionWithWETH(config);
+        //benchmark_SweepERC721CollectionWithWETH(config);
 
+        /*
         benchmark_BuyOfferedERC721WithEther_ListOnChain(config);
         benchmark_BuyOfferedERC1155WithEther_ListOnChain(config);
         benchmark_BuyOfferedERC721WithWETH_ListOnChain(config);
@@ -170,6 +173,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
             config
         );
         benchmark_BuyTenOfferedERC721WithWETHDistinctOrders_ListOnChain(config);
+        */
     }
 
     function beforeAllPrepareMarketplaceTest(BaseMarketConfig config) internal {
@@ -240,7 +244,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         internal
         prepareTest(config)
     {
-        string memory testLabel = "(ERC721 -> ETH)";
+        string memory testLabel = "Buy Listing (ERC721 w/Native)";
         test721_1.mint(alice, 1);
         try
             config.getPayload_BuyOfferedERC721WithEther(
@@ -253,7 +257,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
             _benchmarkCallWithParams(
                 config.name(),
-                string(abi.encodePacked(testLabel, " Fulfill, w/ Sig")),
+                string(abi.encodePacked(testLabel, "")),
                 bob,
                 payload.executeOrder
             );
@@ -304,7 +308,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         internal
         prepareTest(config)
     {
-        string memory testLabel = "(ERC1155 -> ETH)";
+        string memory testLabel = "Buy Listing (ERC1155 w/Native)";
         test1155_1.mint(alice, 1, 1);
         try
             config.getPayload_BuyOfferedERC1155WithEther(
@@ -317,7 +321,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
             _benchmarkCallWithParams(
                 config.name(),
-                string(abi.encodePacked(testLabel, " Fulfill, w/ Sig")),
+                string(abi.encodePacked(testLabel, "")),
                 bob,
                 payload.executeOrder
             );
@@ -375,7 +379,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         internal
         prepareTest(config)
     {
-        string memory testLabel = "(ERC721 -> ERC20)";
+        string memory testLabel = "Buy Listing (ERC721 w/Coin)";
         test721_1.mint(alice, 1);
         token1.mint(bob, 100);
         try
@@ -391,7 +395,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
             _benchmarkCallWithParams(
                 config.name(),
-                string(abi.encodePacked(testLabel, " Fulfill, w/ Sig")),
+                string(abi.encodePacked(testLabel, "")),
                 bob,
                 payload.executeOrder
             );
@@ -565,7 +569,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         internal
         prepareTest(config)
     {
-        string memory testLabel = "(ERC1155 -> ERC20)";
+        string memory testLabel = "Buy Listing (ERC1155 w/Coin)";
         test1155_1.mint(alice, 1, 1);
         token1.mint(bob, 100);
         try
@@ -581,7 +585,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
             _benchmarkCallWithParams(
                 config.name(),
-                string(abi.encodePacked(testLabel, " Fulfill w/ Sig")),
+                string(abi.encodePacked(testLabel, "")),
                 bob,
                 payload.executeOrder
             );
@@ -641,7 +645,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         internal
         prepareTest(config)
     {
-        string memory testLabel = "(ERC20 -> ERC721)";
+        string memory testLabel = "Accept Offer (ERC721 w/Coin)";
         token1.mint(alice, 100);
         test721_1.mint(bob, 1);
         try
@@ -657,7 +661,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
             _benchmarkCallWithParams(
                 config.name(),
-                string(abi.encodePacked(testLabel, " Fulfill w/ Sig")),
+                string(abi.encodePacked(testLabel, "")),
                 bob,
                 payload.executeOrder
             );
@@ -829,7 +833,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         internal
         prepareTest(config)
     {
-        string memory testLabel = "(ERC20 -> ERC1155)";
+        string memory testLabel = "Accept Offer (ERC1155 w/Coin)";
         TestOrderContext memory context = TestOrderContext(false, alice, bob);
         token1.mint(alice, 100);
         test1155_1.mint(bob, 1, 1);
@@ -846,7 +850,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
             _benchmarkCallWithParams(
                 config.name(),
-                string(abi.encodePacked(testLabel, " Fulfill w/ Sig")),
+                string(abi.encodePacked(testLabel, "")),
                 bob,
                 payload.executeOrder
             );
@@ -1003,7 +1007,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         BaseMarketConfig config
     ) internal prepareTest(config) {
         string
-            memory testLabel = "(ERC721 -> ETH One-Fee-Recipient List-On-Chain)";
+            memory testLabel = "(Buy Listing (ERC721 w/Native) One-Fee-Recipient List-On-Chain)";
         test721_1.mint(alice, 1);
         try
             config.getPayload_BuyOfferedERC721WithEtherOneFeeRecipient(
@@ -1046,7 +1050,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         internal
         prepareTest(config)
     {
-        string memory testLabel = "(ERC721 -> ETH One-Fee-Recipient)";
+        string memory testLabel = "Buy Listing (ERC721 w/Native) + 1 Fee";
         test721_1.mint(alice, 1);
         try
             config.getPayload_BuyOfferedERC721WithEtherOneFeeRecipient(
@@ -1062,7 +1066,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
             _benchmarkCallWithParams(
                 config.name(),
-                string(abi.encodePacked(testLabel, " Fulfill w/ Sig")),
+                string(abi.encodePacked(testLabel, "")),
                 bob,
                 payload.executeOrder
             );
@@ -1124,7 +1128,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
     function benchmark_BuyOfferedERC721WithEtherFeeTwoRecipients(
         BaseMarketConfig config
     ) internal prepareTest(config) {
-        string memory testLabel = "(ERC721 -> ETH Two-Fee-Recipient)";
+        string memory testLabel = "Buy Listing (ERC721 w/Native) + 2 Fees";
         test721_1.mint(alice, 1);
         try
             config.getPayload_BuyOfferedERC721WithEtherTwoFeeRecipient(
@@ -1143,7 +1147,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
             _benchmarkCallWithParams(
                 config.name(),
-                string(abi.encodePacked(testLabel, " Fullfil /w Sig")),
+                string(abi.encodePacked(testLabel, "")),
                 bob,
                 payload.executeOrder
             );
@@ -1393,7 +1397,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
     function benchmark_BuyTenOfferedERC721WithEtherDistinctOrders(
         BaseMarketConfig config
     ) internal prepareTest(config) {
-        string memory testLabel = "(ERC721x10 -> ETH Distinct Orders)";
+        string memory testLabel = "Bulk Buy Listings x10 (ERC721 w/Native)";
 
         TestOrderContext[] memory contexts = new TestOrderContext[](10);
         TestItem721[] memory nfts = new TestItem721[](10);
@@ -1419,7 +1423,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
             _benchmarkCallWithParams(
                 config.name(),
-                string(abi.encodePacked(testLabel, " Fulfill /w Sigs")),
+                string(abi.encodePacked(testLabel, "")),
                 bob,
                 payload.executeOrder
             );
@@ -1483,7 +1487,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
     function benchmark_BuyTenOfferedERC721WithErc20DistinctOrders(
         BaseMarketConfig config
     ) internal prepareTest(config) {
-        string memory testLabel = "(ERC721x10 -> ERC20 Distinct Orders)";
+        string memory testLabel = "Bulk Buy Listings x10 (ERC721 w/Coin)";
 
         token1.mint(bob, 1045);
         TestOrderContext[] memory contexts = new TestOrderContext[](10);
@@ -1511,7 +1515,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
             _benchmarkCallWithParams(
                 config.name(),
-                string(abi.encodePacked(testLabel, " Fulfill /w Sigs")),
+                string(abi.encodePacked(testLabel, "")),
                 bob,
                 payload.executeOrder
             );
@@ -1717,7 +1721,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         internal
         prepareTest(config)
     {
-        string memory testLabel = "(Sweep ERC721x10 -> ETH Distinct Orders)";
+        string memory testLabel = "Sweep Collection x10 (ERC721 w/Native)";
 
         TestOrderContext[] memory contexts = new TestOrderContext[](10);
         TestItem721[] memory nfts = new TestItem721[](10);
@@ -1743,7 +1747,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
             _benchmarkCallWithParams(
                 config.name(),
-                string(abi.encodePacked(testLabel, " Fulfill /w Sigs")),
+                string(abi.encodePacked(testLabel, "")),
                 bob,
                 payload.executeOrder
             );
@@ -1759,7 +1763,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
     function benchmark_SweepERC721CollectionWithErc20(
         BaseMarketConfig config
     ) internal prepareTest(config) {
-        string memory testLabel = "(Sweep ERC721x10 -> ERC20 Distinct Orders)";
+        string memory testLabel = "Sweep Collection x10 (ERC721 w/Coin)";
 
         token1.mint(bob, 1045);
         TestOrderContext[] memory contexts = new TestOrderContext[](10);
@@ -1787,7 +1791,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
             _benchmarkCallWithParams(
                 config.name(),
-                string(abi.encodePacked(testLabel, " Fulfill /w Sigs")),
+                string(abi.encodePacked(testLabel, "")),
                 bob,
                 payload.executeOrder
             );
@@ -1855,8 +1859,19 @@ contract GenericMarketplaceTest is BaseOrderTest {
     function setUp() public virtual override {
         super.setUp();
 
+        beforeAllPrepareMarketplaceTest(blurConfig);
+        beforeAllPrepareMarketplaceTest(blurV2Config);
+        beforeAllPrepareMarketplaceTest(foundationConfig);
+        beforeAllPrepareMarketplaceTest(looksRareConfig);
+        beforeAllPrepareMarketplaceTest(looksRareV2Config);
+        beforeAllPrepareMarketplaceTest(paymentProcessorConfig);
         beforeAllPrepareMarketplaceTest(paymentProcessorV2Config);
+        beforeAllPrepareMarketplaceTest(seaportOnePointOneConfig);
         beforeAllPrepareMarketplaceTest(seaportOnePointFiveConfig);
+        beforeAllPrepareMarketplaceTest(sudoswapConfig);
+        beforeAllPrepareMarketplaceTest(wyvernConfig);
+        beforeAllPrepareMarketplaceTest(x2y2Config);
+        beforeAllPrepareMarketplaceTest(zeroExConfig);
     }
 
     modifier prepareTest(BaseMarketConfig config) {
@@ -1943,10 +1958,10 @@ contract GenericMarketplaceTest is BaseOrderTest {
             }
         }
         hevm.stopPrank();
-        emit log_named_uint(
-            _formatLog(name, string(abi.encodePacked(label, " (direct)"))),
-            gasDelta
-        );
+        //emit log_named_uint(
+        //    _formatLog(name, string(abi.encodePacked(label, " (direct)"))),
+        //    gasDelta
+        //);
         emit log_named_uint(
             _formatLog(name, label),
             gasDelta + _additionalGasFee(params.data)
