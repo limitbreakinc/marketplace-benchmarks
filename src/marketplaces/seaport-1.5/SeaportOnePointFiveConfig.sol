@@ -1391,4 +1391,232 @@ contract SeaportOnePointFiveConfig is
             )
         );
     }
+
+    struct AdvancedOrderValues {
+        address fulfiller;
+        AdvancedOrder[] advancedOrders;
+        CriteriaResolver[] criteriaResolvers;
+        FulfillmentComponent[][] offerFulfillments;
+        FulfillmentComponent[][] considerationFulfillments;
+    }
+
+    struct GetAdvancedOrderInputs {
+        TestOrderContext[] contexts;
+        address paymentMethodAddress;
+        TestItem721[] nfts;
+        uint256[] amounts;
+    }
+
+    function getPayload_SweepERC721CollectionWithEther(
+        TestOrderContext[] calldata contexts,
+        TestItem721[] calldata nfts,
+        uint256[] calldata ethAmounts
+    ) external override returns (TestOrderPayload memory execution) {
+        AdvancedOrderValues memory advancedOrderValues = getAdvancedOrderValues(
+            GetAdvancedOrderInputs({
+                contexts: contexts,
+                paymentMethodAddress: address(0),
+                nfts: nfts,
+                amounts: ethAmounts
+            })
+        );
+
+         execution.executeOrder = TestCallParameters(
+            address(seaport),
+            getTotalAmount(ethAmounts),
+            abi.encodeWithSelector(
+                ISeaport.fulfillAvailableAdvancedOrders.selector,
+                advancedOrderValues.advancedOrders,
+                advancedOrderValues.criteriaResolvers,
+                advancedOrderValues.offerFulfillments, //
+                advancedOrderValues.considerationFulfillments, //
+                bytes32(0), //
+                advancedOrderValues.fulfiller,
+                advancedOrderValues.advancedOrders.length
+            )
+        );
+    }
+
+    function getPayload_SweepERC721CollectionWithErc20(
+        TestOrderContext[] calldata contexts,
+        address erc20Address,
+        TestItem721[] calldata nfts,
+        uint256[] calldata erc20Amounts
+    ) external override returns (TestOrderPayload memory execution) {
+        AdvancedOrderValues memory advancedOrderValues = getAdvancedOrderValues(
+            GetAdvancedOrderInputs({
+                contexts: contexts,
+                paymentMethodAddress: erc20Address,
+                nfts: nfts,
+                amounts: erc20Amounts
+            })
+        );
+
+        execution.executeOrder = TestCallParameters(
+            address(seaport),
+            0,
+            abi.encodeWithSelector(
+                ISeaport.fulfillAvailableAdvancedOrders.selector,
+                advancedOrderValues.advancedOrders,
+                advancedOrderValues.criteriaResolvers,
+                advancedOrderValues.offerFulfillments, //
+                advancedOrderValues.considerationFulfillments, //
+                bytes32(0), //
+                advancedOrderValues.fulfiller,
+                advancedOrderValues.advancedOrders.length
+            )
+        );
+    }
+
+    function getPayload_SweepERC721CollectionWithWETH(
+        TestOrderContext[] calldata contexts,
+        address erc20Address,
+        TestItem721[] calldata nfts,
+        uint256[] calldata erc20Amounts
+    ) external override returns (TestOrderPayload memory execution) {
+        AdvancedOrderValues memory advancedOrderValues = getAdvancedOrderValues(
+            GetAdvancedOrderInputs({
+                contexts: contexts,
+                paymentMethodAddress: erc20Address,
+                nfts: nfts,
+                amounts: erc20Amounts
+            })
+        );
+
+        execution.executeOrder = TestCallParameters(
+            address(seaport),
+            0,
+            abi.encodeWithSelector(
+                ISeaport.fulfillAvailableAdvancedOrders.selector,
+                advancedOrderValues.advancedOrders,
+                advancedOrderValues.criteriaResolvers,
+                advancedOrderValues.offerFulfillments, //
+                advancedOrderValues.considerationFulfillments, //
+                bytes32(0), //
+                advancedOrderValues.fulfiller,
+                advancedOrderValues.advancedOrders.length
+            )
+        );
+    }
+
+    function getTotalAmount(uint256[] memory amounts) internal pure returns (uint256) {
+        uint256 total = 0;
+        for (uint256 i = 0; i < amounts.length; ++i) {
+            total += amounts[i];
+        }
+        return total;
+    }
+
+    function getAdvancedOrderValues(
+        GetAdvancedOrderInputs memory inputs
+    ) internal returns (
+        AdvancedOrderValues memory advancedOrderValues
+    ) {
+        advancedOrderValues.fulfiller = inputs.contexts[0].fulfiller;
+        advancedOrderValues.advancedOrders = new AdvancedOrder[](inputs.nfts.length);
+        advancedOrderValues.criteriaResolvers = new CriteriaResolver[](0);
+        advancedOrderValues.offerFulfillments = new FulfillmentComponent[][](inputs.nfts.length);
+        advancedOrderValues.considerationFulfillments = new FulfillmentComponent[][](inputs.nfts.length);
+        
+        for (uint256 i = 0; i < inputs.nfts.length; ++i) {
+            OfferItem[] memory offerItems = new OfferItem[](1);
+            ConsiderationItem[] memory considerationItems = new ConsiderationItem[](1);
+
+            offerItems[0] = 
+                OfferItem(
+                    ItemType.ERC721,
+                    inputs.nfts[i].token,
+                    inputs.nfts[i].identifier,
+                    1,
+                    1
+                );
+    
+            considerationItems[0] =
+                ConsiderationItem(
+                    inputs.paymentMethodAddress == address(0) ? ItemType.NATIVE : ItemType.ERC20,
+                    inputs.paymentMethodAddress,
+                    0,
+                    inputs.amounts[i],
+                    inputs.amounts[i],
+                    payable(inputs.contexts[i].offerer)
+                );
+
+            OrderComponents memory orderComponents = OrderComponents(
+                    inputs.contexts[i].offerer,
+                    address(0), //inputs.zone,
+                    offerItems,
+                    considerationItems,
+                    OrderType.PARTIAL_OPEN,
+                    block.timestamp,
+                    block.timestamp + 1,
+                    bytes32(0), //inputs.zoneHash,
+                    0, //inputs.salt,
+                    bytes32(0), //conduitKey,
+                    seaport.getCounter(inputs.contexts[i].offerer)
+                );
+
+            OrderParameters memory orderParameters = OrderParameters(
+                    inputs.contexts[i].offerer,
+                    address(0), //inputs.zone,
+                    offerItems,
+                    considerationItems,
+                    OrderType.PARTIAL_OPEN,
+                    block.timestamp,
+                    block.timestamp + 1,
+                    bytes32(0), //inputs.zoneHash,
+                    0, //inputs.salt,
+                    bytes32(0), //conduitKey,
+                    considerationItems.length
+                );
+
+             advancedOrderValues.advancedOrders[i] = AdvancedOrder(
+                    orderParameters,
+                    1,
+                    1,
+                    signOrder(
+                        seaport,
+                        inputs.contexts[i].offerer,
+                        seaport.getOrderHash(orderComponents)
+                    ),
+                    "0x"
+                );
+
+            FulfillmentComponent[] memory fulfillmentComponents1 = new FulfillmentComponent[](1);
+            fulfillmentComponents1[0] = FulfillmentComponent(i, 0);
+
+            FulfillmentComponent[] memory fulfillmentComponents2 = new FulfillmentComponent[](1);
+            fulfillmentComponents2[0] = FulfillmentComponent(i, 0);
+
+            advancedOrderValues.offerFulfillments[i] = fulfillmentComponents1;
+            advancedOrderValues.considerationFulfillments[i] = fulfillmentComponents2;
+        }
+    }
+
+    function signOrder(
+        ISeaport _consideration,
+        address signer,
+        bytes32 _orderHash
+    ) internal view returns (bytes memory) {
+        (bytes32 r, bytes32 s, uint8 v) = getSignatureComponents(
+            _consideration,
+            signer,
+            _orderHash
+        );
+        return abi.encodePacked(r, s, v);
+    }
+
+    function getSignatureComponents(
+        ISeaport _consideration,
+        address signer,
+        bytes32 _orderHash
+    ) internal view returns (bytes32, bytes32, uint8) {
+        (, bytes32 domainSeparator, ) = _consideration.information();
+        (uint8 v, bytes32 r, bytes32 s) = _sign(
+            signer,
+            keccak256(
+                abi.encodePacked(bytes2(0x1901), domainSeparator, _orderHash)
+            )
+        );
+        return (r, s, v);
+    }
 }

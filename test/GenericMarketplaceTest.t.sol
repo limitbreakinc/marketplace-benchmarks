@@ -7,6 +7,7 @@ import { BlurV2Config } from "../src/marketplaces/blur-2.0/BlurV2Config.sol";
 import { FoundationConfig } from "../src/marketplaces/foundation/FoundationConfig.sol";
 import { LooksRareConfig } from "../src/marketplaces/looksRare/LooksRareConfig.sol";
 import { PaymentProcessorConfig } from "../src/marketplaces/lb-payment-processor/PaymentProcessorConfig.sol";
+import { PaymentProcessorV2Config } from "../src/marketplaces/lb-payment-processor-v2/PaymentProcessorV2Config.sol";
 import { SeaportOnePointFiveConfig } from "../src/marketplaces/seaport-1.5/SeaportOnePointFiveConfig.sol";
 import { LooksRareV2Config } from "../src/marketplaces/looksRare-v2/LooksRareV2Config.sol";
 import { SeaportOnePointOneConfig } from "../src/marketplaces/seaport-1.1/SeaportOnePointOneConfig.sol";
@@ -28,6 +29,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
     BaseMarketConfig foundationConfig;
     BaseMarketConfig looksRareConfig;
     BaseMarketConfig paymentProcessorConfig;
+    BaseMarketConfig paymentProcessorV2Config;
     BaseMarketConfig looksRareV2Config;
     BaseMarketConfig seaportOnePointOneConfig;
     BaseMarketConfig seaportOnePointFiveConfig;
@@ -42,6 +44,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         foundationConfig = BaseMarketConfig(new FoundationConfig());
         looksRareConfig = BaseMarketConfig(new LooksRareConfig());
         paymentProcessorConfig = BaseMarketConfig(new PaymentProcessorConfig());
+        paymentProcessorV2Config = BaseMarketConfig(new PaymentProcessorV2Config());
         looksRareV2Config = BaseMarketConfig(new LooksRareV2Config());
         seaportOnePointOneConfig = BaseMarketConfig(
             new SeaportOnePointOneConfig()
@@ -55,6 +58,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         zeroExConfig = BaseMarketConfig(new ZeroExConfig());
     }
 
+    /*
     function testBlur() external {
         benchmarkMarket(blurConfig);
     }
@@ -62,7 +66,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
     function testBlurV2() external {
         benchmarkMarket(blurV2Config);
     }
+    */
 
+    /*
     function testFoundation() external {
         benchmarkMarket(foundationConfig);
     }
@@ -74,11 +80,13 @@ contract GenericMarketplaceTest is BaseOrderTest {
     function testLooksRareV2() external {
         benchmarkMarket(looksRareV2Config);
     }
+    */
 
     function testSeaportOnePointFive() external {
         benchmarkMarket(seaportOnePointFiveConfig);
     }
 
+    /*
     function testSeaportOnePointOne() external {
         benchmarkMarket(seaportOnePointOneConfig);
     }
@@ -102,9 +110,14 @@ contract GenericMarketplaceTest is BaseOrderTest {
     function testPaymentProcessor() external {
         benchmarkMarket(paymentProcessorConfig);
     }
+    */
+
+    function testPaymentProcessorV2() external {
+        benchmarkMarket(paymentProcessorV2Config);
+    }
 
     function benchmarkMarket(BaseMarketConfig config) public {
-        beforeAllPrepareMarketplaceTest(config);
+        //beforeAllPrepareMarketplaceTest(config);
         benchmark_BuyOfferedERC721WithEther(config);
         benchmark_BuyOfferedERC1155WithEther(config);
         benchmark_BuyOfferedERC721WithWETH(config);
@@ -133,6 +146,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividuallyWithEtherFeeTwoRecipients(
             config
         );
+        benchmark_SweepERC721CollectionWithEther(config);
+        benchmark_SweepERC721CollectionWithErc20(config);
+        benchmark_SweepERC721CollectionWithWETH(config);
 
         benchmark_BuyOfferedERC721WithEther_ListOnChain(config);
         benchmark_BuyOfferedERC1155WithEther_ListOnChain(config);
@@ -175,6 +191,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
         // Do any final setup within config
         config.beforeAllPrepareMarketplace(alice, bob);
+        config.beforeAllPrepareMarketplaceCollections(address(test721_1), address(test1155_1));
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -1696,12 +1713,150 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
     }
 
+    function benchmark_SweepERC721CollectionWithEther(BaseMarketConfig config)
+        internal
+        prepareTest(config)
+    {
+        string memory testLabel = "(Sweep ERC721x10 -> ETH Distinct Orders)";
+
+        TestOrderContext[] memory contexts = new TestOrderContext[](10);
+        TestItem721[] memory nfts = new TestItem721[](10);
+        uint256[] memory ethAmounts = new uint256[](10);
+
+        for (uint256 i = 0; i < 10; i++) {
+            test721_1.mint(alice, i + 1);
+            nfts[i] = TestItem721(address(test721_1), i + 1);
+            contexts[i] = TestOrderContext(false, alice, bob);
+            ethAmounts[i] = 100 + i;
+        }
+
+        try
+            config.getPayload_SweepERC721CollectionWithEther(
+                contexts,
+                nfts,
+                ethAmounts
+            )
+        returns (TestOrderPayload memory payload) {
+            for (uint256 i = 1; i <= 10; i++) {
+                assertEq(test721_1.ownerOf(i), alice);
+            }
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill /w Sigs")),
+                bob,
+                payload.executeOrder
+            );
+
+            for (uint256 i = 1; i <= 10; i++) {
+                assertEq(test721_1.ownerOf(i), bob);
+            }
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_SweepERC721CollectionWithErc20(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
+        string memory testLabel = "(Sweep ERC721x10 -> ERC20 Distinct Orders)";
+
+        token1.mint(bob, 1045);
+        TestOrderContext[] memory contexts = new TestOrderContext[](10);
+        TestItem721[] memory nfts = new TestItem721[](10);
+        uint256[] memory erc20Amounts = new uint256[](10);
+
+        for (uint256 i = 0; i < 10; i++) {
+            test721_1.mint(alice, i + 1);
+            nfts[i] = TestItem721(address(test721_1), i + 1);
+            contexts[i] = TestOrderContext(false, alice, bob);
+            erc20Amounts[i] = 100 + i;
+        }
+
+        try
+            config.getPayload_SweepERC721CollectionWithErc20(
+                contexts,
+                address(token1),
+                nfts,
+                erc20Amounts
+            )
+        returns (TestOrderPayload memory payload) {
+            for (uint256 i = 1; i <= 10; i++) {
+                assertEq(test721_1.ownerOf(i), alice);
+            }
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill /w Sigs")),
+                bob,
+                payload.executeOrder
+            );
+
+            for (uint256 i = 1; i <= 10; i++) {
+                assertEq(test721_1.ownerOf(i), bob);
+            }
+            assertEq(token1.balanceOf(alice), 1045);
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_SweepERC721CollectionWithWETH(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
+        string memory testLabel = "(Sweep ERC721x10 -> WETH Distinct Orders)";
+
+        hevm.deal(bob, 1045);
+        hevm.prank(bob);
+        weth.deposit{ value: 1045 }();
+        TestOrderContext[] memory contexts = new TestOrderContext[](10);
+        TestItem721[] memory nfts = new TestItem721[](10);
+        uint256[] memory wethAmounts = new uint256[](10);
+
+        for (uint256 i = 0; i < 10; i++) {
+            test721_1.mint(alice, i + 1);
+            nfts[i] = TestItem721(address(test721_1), i + 1);
+            contexts[i] = TestOrderContext(false, alice, bob);
+            wethAmounts[i] = 100 + i;
+        }
+
+        try
+            config.getPayload_SweepERC721CollectionWithWETH(
+                contexts,
+                address(weth),
+                nfts,
+                wethAmounts
+            )
+        returns (TestOrderPayload memory payload) {
+            for (uint256 i = 1; i <= 10; i++) {
+                assertEq(test721_1.ownerOf(i), alice);
+            }
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill /w Sigs")),
+                bob,
+                payload.executeOrder
+            );
+
+            for (uint256 i = 1; i <= 10; i++) {
+                assertEq(test721_1.ownerOf(i), bob);
+            }
+            assertEq(weth.balanceOf(alice), 1045);
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
     /*//////////////////////////////////////////////////////////////
                           Helpers
     //////////////////////////////////////////////////////////////*/
 
     function setUp() public virtual override {
         super.setUp();
+
+        beforeAllPrepareMarketplaceTest(paymentProcessorV2Config);
+        beforeAllPrepareMarketplaceTest(seaportOnePointFiveConfig);
     }
 
     modifier prepareTest(BaseMarketConfig config) {

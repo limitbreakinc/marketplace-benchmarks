@@ -33,7 +33,7 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
     uint256 internal securityPolicyId;
 
     IPaymentProcessor paymentProcessor =
-        IPaymentProcessor(address(0x009a1dC629242961C9E4f089b437aFD394474cc0));
+        IPaymentProcessor(address(0x009a1dc9F1A6e2134aD4236Fcd75B1aE62858507));
     mapping(address => uint256) internal _nonces;
 
     function name() external pure override returns (string memory) {
@@ -44,14 +44,22 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
         return address(paymentProcessor);
     }
 
-    function beforeAllPrepareMarketplace(address, address) external override {
+    function beforeAllPrepareMarketplace(address seller, address buyer) external override {
         buyerNftApprovalTarget = sellerNftApprovalTarget = buyerErc20ApprovalTarget = sellerErc20ApprovalTarget = address(
             paymentProcessor
         );
 
+        vm.prank(seller);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(seller));
+
+        vm.prank(buyer);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(buyer));
+    }
+
+    function beforeAllPrepareMarketplaceCollections(address test721_1, address test1155_1) external override {
         securityPolicyId = paymentProcessor.createSecurityPolicy(
             false,
-            true,
+            false,
             false,
             false,
             false,
@@ -60,7 +68,15 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
             2300,
             "TEST POLICY"
         );
-    }
+
+        vm.startPrank(address(test721_1));
+        paymentProcessor.setCollectionSecurityPolicy(test721_1, securityPolicyId);
+        vm.stopPrank();
+
+        vm.startPrank(address(test1155_1));
+        paymentProcessor.setCollectionSecurityPolicy(test1155_1, securityPolicyId);
+        vm.stopPrank();
+     }
 
     function getPayload_BuyOfferedERC721WithEther(
         TestOrderContext calldata context,
@@ -73,12 +89,6 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
 
         address alice = context.offerer;
         address bob = context.fulfiller;
-
-        vm.prank(alice);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
-
-        vm.prank(bob);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
 
         MatchedOrder memory saleDetails = MatchedOrder({
             sellerAcceptedOffer: false,
@@ -135,12 +145,6 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
         address alice = context.offerer;
         address bob = context.fulfiller;
 
-        vm.prank(alice);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
-
-        vm.prank(bob);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
-
         MatchedOrder memory saleDetails = MatchedOrder({
             sellerAcceptedOffer: false,
             collectionLevelOffer: false,
@@ -193,32 +197,8 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
             _notImplemented();
         }
 
-        vm.prank(nft.token);
-        paymentProcessor.setCollectionSecurityPolicy(
-            nft.token,
-            securityPolicyId
-        );
-
-        if (
-            !paymentProcessor.isPaymentMethodApproved(
-                securityPolicyId,
-                erc20.token
-            )
-        ) {
-            paymentProcessor.whitelistPaymentMethod(
-                securityPolicyId,
-                erc20.token
-            );
-        }
-
         address alice = context.offerer;
         address bob = context.fulfiller;
-
-        vm.prank(alice);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
-
-        vm.prank(bob);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
 
         MatchedOrder memory saleDetails = MatchedOrder({
             sellerAcceptedOffer: false,
@@ -272,32 +252,8 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
             _notImplemented();
         }
 
-        vm.prank(nft.token);
-        paymentProcessor.setCollectionSecurityPolicy(
-            nft.token,
-            securityPolicyId
-        );
-
-        if (
-            !paymentProcessor.isPaymentMethodApproved(
-                securityPolicyId,
-                erc20.token
-            )
-        ) {
-            paymentProcessor.whitelistPaymentMethod(
-                securityPolicyId,
-                erc20.token
-            );
-        }
-
         address alice = context.offerer;
         address bob = context.fulfiller;
-
-        vm.prank(alice);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
-
-        vm.prank(bob);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
 
         MatchedOrder memory saleDetails = MatchedOrder({
             sellerAcceptedOffer: false,
@@ -351,32 +307,8 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
             _notImplemented();
         }
 
-        vm.prank(nft.token);
-        paymentProcessor.setCollectionSecurityPolicy(
-            nft.token,
-            securityPolicyId
-        );
-
-        if (
-            !paymentProcessor.isPaymentMethodApproved(
-                securityPolicyId,
-                erc20.token
-            )
-        ) {
-            paymentProcessor.whitelistPaymentMethod(
-                securityPolicyId,
-                erc20.token
-            );
-        }
-
         address alice = context.offerer;
         address bob = context.fulfiller;
-
-        vm.prank(alice);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
-
-        vm.prank(bob);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
 
         MatchedOrder memory saleDetails = MatchedOrder({
             sellerAcceptedOffer: false,
@@ -430,32 +362,8 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
             _notImplemented();
         }
 
-        vm.prank(nft.token);
-        paymentProcessor.setCollectionSecurityPolicy(
-            nft.token,
-            securityPolicyId
-        );
-
-        if (
-            !paymentProcessor.isPaymentMethodApproved(
-                securityPolicyId,
-                erc20.token
-            )
-        ) {
-            paymentProcessor.whitelistPaymentMethod(
-                securityPolicyId,
-                erc20.token
-            );
-        }
-
         address alice = context.offerer;
         address bob = context.fulfiller;
-
-        vm.prank(alice);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
-
-        vm.prank(bob);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
 
         MatchedOrder memory saleDetails = MatchedOrder({
             sellerAcceptedOffer: true,
@@ -509,32 +417,8 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
             _notImplemented();
         }
 
-        vm.prank(nft.token);
-        paymentProcessor.setCollectionSecurityPolicy(
-            nft.token,
-            securityPolicyId
-        );
-
-        if (
-            !paymentProcessor.isPaymentMethodApproved(
-                securityPolicyId,
-                erc20.token
-            )
-        ) {
-            paymentProcessor.whitelistPaymentMethod(
-                securityPolicyId,
-                erc20.token
-            );
-        }
-
         address alice = context.offerer;
         address bob = context.fulfiller;
-
-        vm.prank(alice);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
-
-        vm.prank(bob);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
 
         MatchedOrder memory saleDetails = MatchedOrder({
             sellerAcceptedOffer: true,
@@ -588,32 +472,8 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
             _notImplemented();
         }
 
-        vm.prank(nft.token);
-        paymentProcessor.setCollectionSecurityPolicy(
-            nft.token,
-            securityPolicyId
-        );
-
-        if (
-            !paymentProcessor.isPaymentMethodApproved(
-                securityPolicyId,
-                erc20.token
-            )
-        ) {
-            paymentProcessor.whitelistPaymentMethod(
-                securityPolicyId,
-                erc20.token
-            );
-        }
-
         address alice = context.offerer;
         address bob = context.fulfiller;
-
-        vm.prank(alice);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
-
-        vm.prank(bob);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
 
         MatchedOrder memory saleDetails = MatchedOrder({
             sellerAcceptedOffer: true,
@@ -671,12 +531,6 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
 
         address alice = context.offerer;
         address bob = context.fulfiller;
-
-        vm.prank(alice);
-        paymentProcessor.revokeSingleNonce(feeRecipient, _getNextNonce(alice));
-
-        vm.prank(bob);
-        paymentProcessor.revokeSingleNonce(feeRecipient, _getNextNonce(bob));
 
         uint256 ethAmount = priceEthAmount + feeEthAmount;
         uint256 feeRate = (feeEthAmount * 10000) / priceEthAmount;
@@ -739,12 +593,6 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
 
         address alice = context.offerer;
         address bob = context.fulfiller;
-
-        vm.prank(alice);
-        paymentProcessor.revokeSingleNonce(feeRecipient1, _getNextNonce(alice));
-
-        vm.prank(bob);
-        paymentProcessor.revokeSingleNonce(feeRecipient1, _getNextNonce(bob));
 
         uint256 ethAmount = priceEthAmount + feeEthAmount1 + feeEthAmount2;
         uint256 feeRate1 = (feeEthAmount1 * 10000) / priceEthAmount;
@@ -809,12 +657,6 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
         }
         address alice = context.offerer;
         address bob = context.fulfiller;
-
-        vm.prank(alice);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
-
-        vm.prank(bob);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
 
         MatchedOrderBundleBase
             memory bundledOfferDetails = MatchedOrderBundleBase({
@@ -952,12 +794,6 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
         uint256 numItemsInBundle = nfts.length;
         uint256 totalEthAmount = 0;
 
-        vm.prank(alice);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
-
-        vm.prank(bob);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
-
         for (uint256 i = 0; i < numItemsInBundle; ++i) {
             totalEthAmount += ethAmounts[i];
         }
@@ -1094,12 +930,6 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
         address alice = args.context.offerer;
         address bob = args.context.fulfiller;
 
-        vm.prank(alice);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
-
-        vm.prank(bob);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
-
         for (uint256 i = 0; i < numItemsInBundle; ++i) {
             totalEthAmount += args.itemPrices[i];
         }
@@ -1235,12 +1065,6 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
         uint256 numItemsInBundle = args.nfts.length;
         address alice = args.context.offerer;
         address bob = args.context.fulfiller;
-
-        vm.prank(alice);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
-
-        vm.prank(bob);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
 
         for (uint256 i = 0; i < numItemsInBundle; ++i) {
             totalEthAmount += args.itemPrices[i];
@@ -1387,12 +1211,6 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
         address alice = contexts[0].offerer;
         address bob = contexts[0].fulfiller;
 
-        vm.prank(alice);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
-
-        vm.prank(bob);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
-
         for (uint256 i = 0; i < numItemsInBundle; ++i) {
             totalEthAmount += ethAmounts[i];
         }
@@ -1489,34 +1307,10 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
             }
         }
 
-        vm.prank(nfts[0].token);
-        paymentProcessor.setCollectionSecurityPolicy(
-            nfts[0].token,
-            securityPolicyId
-        );
-
-        if (
-            !paymentProcessor.isPaymentMethodApproved(
-                securityPolicyId,
-                erc20Address
-            )
-        ) {
-            paymentProcessor.whitelistPaymentMethod(
-                securityPolicyId,
-                erc20Address
-            );
-        }
-
         uint256 totalErc20Amount = 0;
         uint256 numItemsInBundle = nfts.length;
         address alice = contexts[0].offerer;
         address bob = contexts[0].fulfiller;
-
-        vm.prank(alice);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
-
-        vm.prank(bob);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
 
         for (uint256 i = 0; i < numItemsInBundle; ++i) {
             totalErc20Amount += erc20Amounts[i];
@@ -1614,34 +1408,10 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
             }
         }
 
-        vm.prank(nfts[0].token);
-        paymentProcessor.setCollectionSecurityPolicy(
-            nfts[0].token,
-            securityPolicyId
-        );
-
-        if (
-            !paymentProcessor.isPaymentMethodApproved(
-                securityPolicyId,
-                erc20Address
-            )
-        ) {
-            paymentProcessor.whitelistPaymentMethod(
-                securityPolicyId,
-                erc20Address
-            );
-        }
-
         uint256 totalErc20Amount = 0;
         uint256 numItemsInBundle = nfts.length;
         address alice = contexts[0].offerer;
         address bob = contexts[0].fulfiller;
-
-        vm.prank(alice);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
-
-        vm.prank(bob);
-        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
 
         for (uint256 i = 0; i < numItemsInBundle; ++i) {
             totalErc20Amount += erc20Amounts[i];
